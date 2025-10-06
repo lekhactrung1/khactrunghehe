@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lá Thư Đêm Trăng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --moon:#FFD700; --lantern:#E67E22; --red:#C0392B; --wood:#8E5B2D;
+      --paper:#fffdf2; --border:#b0812f;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Noto Serif', serif; color:#2c2c2c;
+      background: linear-gradient(180deg, #1a1a2e, #16213e, #0f3460);
+      overflow:hidden; display:flex; align-items:center; justify-content:center;
+      position:relative;
+    }
+    
+    /* Canvas background */
+    #bg{ 
+      position:fixed; 
+      inset:0; 
+      z-index:0; 
+      pointer-events:none; 
+      width:100%; 
+      height:100%;
+    }
+
+    /* Glowing moon */
+    .moon{
+      position:fixed; 
+      right:5vw; 
+      top:5vh; 
+      width:120px; 
+      height:120px; 
+      border-radius:50%;
+      background: radial-gradient(circle at 35% 35%, #fffbe3 0%, #ffe57a 62%, #e0b300 100%);
+      border:3px solid #b8860b;
+      box-shadow: 
+        0 0 30px 12px rgba(255,215,0,0.4),
+        0 0 80px 25px rgba(255,200,0,0.2);
+      animation: moonPulse 4s ease-in-out infinite;
+      z-index:1;
+    }
+    
+    @keyframes moonPulse{
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 
+          0 0 25px 10px rgba(255,215,0,0.35),
+          0 0 70px 20px rgba(255,200,0,0.18);
+      }
+      50% { 
+        transform: scale(1.05);
+        box-shadow: 
+          0 0 35px 15px rgba(255,215,0,0.5),
+          0 0 90px 30px rgba(255,200,0,0.25);
+      }
+    }
+
+    /* Lá rơi */
+    .leaf {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 1;
+      animation: leafFall linear infinite;
+    }
+    
+    .leaf.maple {
+      background: linear-gradient(45deg, #ffd700, #ffa500);
+      clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+    }
+    
+    .leaf.bo-de {
+      background: linear-gradient(45deg, #ffed4e, #ff8c42);
+      border-radius: 50% 0 50% 50%;
+      transform: rotate(45deg);
+    }
+    
+    @keyframes leafFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Đèn lồng bay */
+    .lantern {
+      position: absolute;
+      width: 24px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 1;
+      animation: lanternFloat linear infinite;
+      background: linear-gradient(180deg, #fff6d0, #ffd87a, #e0a000);
+      border: 2px solid #b8860b;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    
+    .lantern::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 12px;
+      background: #8E5B2D;
+    }
+    
+    @keyframes lanternFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-100px) rotate(12deg);
+        opacity: 0;
+      }
+    }
+
+    /* Sao lấp lánh */
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: twinkle 3s ease-in-out infinite;
+      box-shadow: 0 0 6px white;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Scroll letter */
+    .scroll{
+      position:relative; 
+      z-index:2; 
+      width:min(500px, 90vw); 
+      background: linear-gradient(180deg, var(--paper), #f7e7be);
+      border:2px solid var(--border);
+      border-radius:8px;
+      box-shadow: 
+        0 10px 30px rgba(0,0,0,0.15), 
+        0 0 25px rgba(255,215,0,0.25);
+      padding:30px 25px;
+      transform: scale(0.8);
+      opacity: 0;
+      animation: scrollAppear 1s ease-out forwards;
+    }
+    
+    @keyframes scrollAppear {
+      0% { 
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+      }
+      100% { 
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Scroll top/bottom borders */
+    .scroll::before, .scroll::after{
+      content:""; 
+      position:absolute; 
+      left:0; 
+      right:0; 
+      height:8px;
+      background: linear-gradient(90deg, var(--border), #d7a451, var(--border));
+    }
+    .scroll::before{ top:0; }
+    .scroll::after{ bottom:0; }
+
+    .letter{ 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      text-align:center;
+    }
+    
+    .letter h2{ 
+      margin:0 0 15px 0; 
+      font-family:'Dancing Script', cursive; 
+      font-size:clamp(28px, 6vw, 40px); 
+      color:var(--red);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .letter p{ 
+      margin:12px 0; 
+      line-height:1.6; 
+      font-size:clamp(15px, 3vw, 17px);
+      color: #5c3b1f;
+    }
+
+    /* Buttons */
+    .next-btn{
+      margin-top:20px;
+      padding:12px 32px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #fff4bf, #ffe089);
+      color: #6b3e10;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(230,126,34,0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .next-btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+    }
+    
+    .next-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s;
+    }
+    
+    .next-btn:hover::before {
+      left: 100%;
+    }
+
+    .close-btn{ 
+      position:absolute; 
+      top:12px; 
+      right:15px; 
+      border:none; 
+      background:transparent; 
+      color:var(--red); 
+      font-size:24px; 
+      cursor:pointer;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .close-btn:hover{
+      background: rgba(166, 77, 46, 0.1);
+      transform: scale(1.1);
+    }
+
+    /* Typing cursor effect */
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--red);
+      margin-left: 2px;
+      animation: blink 1s infinite;
+      vertical-align: middle;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="moon" aria-hidden="true"></div>
+  <div id="effects-container"></div>
+
+  <div class="scroll" id="paper">
+    <button class="close-btn" id="closeBtn" aria-label="Đóng">×</button>
+    <div class="letter">
+      <h2>Lá Thư Gửi Đêm Trung Thu</h2>
+      <p id="line1"></p>
+      <p id="line2"></p>
+      <p id="line3"></p>
+      <p id="line4" style="font-weight:600;color:#a64d2e; margin-top: 20px;"></p>
+      <button class="next-btn" id="nextBtn">Ngắm Trăng 🌕</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== TẠO HIỆU ỨNG LÁ RƠI, ĐÈN LỒNG BAY, SAO LẤP LÁNH =====
+    (function createEffects() {
+      const container = document.getElementById('effects-container');
+      
+      // Tạo sao lấp lánh
+      function createStars() {
+        const starCount = 100;
+        for (let i = 0; i < starCount; i++) {
+          const star = document.createElement('div');
+          star.className = 'star';
+          star.style.left = Math.random() * 100 + 'vw';
+          star.style.top = Math.random() * 100 + 'vh';
+          star.style.animationDelay = Math.random() * 3 + 's';
+          star.style.opacity = Math.random() * 0.7 + 0.3;
+          container.appendChild(star);
+        }
+      }
+      
+      // Tạo lá rơi
+      function createLeaves() {
+        const leafCount = 25;
+        for (let i = 0; i < leafCount; i++) {
+          const leaf = document.createElement('div');
+          leaf.className = `leaf ${Math.random() > 0.5 ? 'maple' : 'bo-de'}`;
+          leaf.style.left = Math.random() * 100 + 'vw';
+          leaf.style.animationDuration = (15 + Math.random() * 20) + 's';
+          leaf.style.animationDelay = Math.random() * 10 + 's';
+          leaf.style.opacity = Math.random() * 0.6 + 0.4;
+          leaf.style.transform = `scale(${0.5 + Math.random() * 0.7})`;
+          container.appendChild(leaf);
+        }
+      }
+      
+      // Tạo đèn lồng bay
+      function createLanterns() {
+        const lanternCount = 12;
+        for (let i = 0; i < lanternCount; i++) {
+          const lantern = document.createElement('div');
+          lantern.className = 'lantern';
+          lantern.style.left = Math.random() * 100 + 'vw';
+          lantern.style.animationDuration = (20 + Math.random() * 25) + 's';
+          lantern.style.animationDelay = Math.random() * 15 + 's';
+          lantern.style.opacity = Math.random() * 0.5 + 0.5;
+          container.appendChild(lantern);
+        }
+      }
+      
+      createStars();
+      createLeaves();
+      createLanterns();
+    })();
+
+    // ===== Canvas Background - Bụi vàng lấp lánh =====
+    (function(){
+      const canvas = document.getElementById('bg');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      
+      function createParticles() {
+        const particles = [];
+        const count = Math.min(80, Math.floor((width * height) / 4000));
+        
+        for(let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 2 + 1,
+            speed: Math.random() * 0.5 + 0.2,
+            opacity: Math.random() * 0.5 + 0.3
+          });
+        }
+        return particles;
+      }
+      
+      let particles = [];
+      
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Vẽ các hạt bụi vàng lấp lánh
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.6)';
+        particles.forEach(particle => {
+          particle.y -= particle.speed;
+          if (particle.y < -10) {
+            particle.y = height + 10;
+            particle.x = Math.random() * width;
+          }
+          
+          ctx.globalAlpha = particle.opacity * (0.7 + 0.3 * Math.sin(Date.now() * 0.002 + particle.x));
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animate);
+      }
+      
+      // Khởi tạo
+      window.addEventListener('resize', () => {
+        resize();
+        particles = createParticles();
+      });
+      
+      resize();
+      particles = createParticles();
+      animate();
+    })();
+
+    // ===== Hiệu ứng gõ chữ =====
+    (function(){
+      const lines = [
+        "Trăng rằm tháng Tám lại về, mang theo hương bánh nồng nàn và ánh đèn rực rỡ.",
+        "Chúc Lan Trung Thu vui vẻ",
+        "Ước mong điều bình yên nhất sẽ tìm đến hehe .",
+      ];
+      
+      const ids = ['line1','line2','line3','line4'];
+      let currentLine = 0;
+      let currentChar = 0;
+      let typingSpeed = 40; // ms per character
+      
+      function typeWriter() {
+        if (currentLine >= lines.length) {
+          // Hiển thị nút khi hoàn thành
+          document.getElementById('nextBtn').style.display = 'block';
+          // Ẩn cursor
+          const cursor = document.querySelector('.typing-cursor');
+          if (cursor) cursor.remove();
+          return;
+        }
+        
+        const currentElement = document.getElementById(ids[currentLine]);
+        const currentText = lines[currentLine];
+        
+        if (currentChar < currentText.length) {
+          // Thêm cursor nếu chưa có
+          if (!currentElement.querySelector('.typing-cursor')) {
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            currentElement.appendChild(cursor);
+          }
+          
+          currentElement.textContent = currentText.substring(0, currentChar + 1);
+          currentChar++;
+          
+          // Tốc độ gõ ngẫu nhiên tự nhiên hơn
+          const speedVariation = Math.random() * 20 - 10;
+          let delay = typingSpeed + speedVariation;
+          
+          // Tạm dừng lâu hơn ở dấu câu
+          const currentCharacter = currentText[currentChar - 1];
+          if (',.?!;:—'.includes(currentCharacter)) {
+            delay += 150;
+          }
+          
+          setTimeout(typeWriter, delay);
+        } else {
+          // Chuyển sang dòng tiếp theo
+          currentLine++;
+          currentChar = 0;
+          setTimeout(typeWriter, 500); // Delay giữa các dòng
+        }
+      }
+      
+      // Bắt đầu hiệu ứng gõ chữ sau khi trang load
+      window.addEventListener('load', () => {
+        setTimeout(typeWriter, 1000);
+      });
+    })();
+
+    // ===== Xử lý sự kiện nút =====
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      // Hiệu ứng chuyển trang
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => {
+        window.location.href = "trang3.html";
+      }, 500);
+    });
+    
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      // Hiệu ứng đóng (reload trang)
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => {
+        location.reload();
+      }, 300);
+    });
+  </script>
+</body>
+</html>

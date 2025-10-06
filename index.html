@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tố Lan Trung Thu Vui Vẻ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Noto+Serif:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --moon:#FFD700;
+      --lantern:#E67E22;
+      --red:#C0392B;
+      --wood:#8E5B2D;
+      --cream:#FFF7E6;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Noto Serif', serif;
+      color:#2c2c2c;
+      background: radial-gradient(1200px 800px at 70% 15%, rgba(255,215,0,0.25), transparent 60%),
+                  linear-gradient(180deg, #FFEFBA, #FFFFFF);
+      display:flex;align-items:center;justify-content:center;overflow:hidden;
+      position:relative;
+    }
+    
+    /* Mặt trăng */
+    .moon-glow {
+      position:fixed; top:10%; right:10%; width:120px; height:120px; border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, #fff6d8, #ffd257 62%, #e0a800 100%);
+      border:3px solid #b8860b; box-shadow:0 0 40px 15px rgba(255,215,0,0.4);
+      z-index:1; opacity:0.8; animation:moonPulse 4s ease-in-out infinite;
+    }
+    @keyframes moonPulse { 
+      0%,100% { transform:scale(1); opacity:0.8; } 
+      50% { transform:scale(1.05); opacity:0.9; } 
+    }
+
+    /* floating lanterns and stars */
+    .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.8;
+      animation: twinkle calc(2s + 3s*var(--r)) ease-in-out infinite alternate;
+      box-shadow:0 0 6px 2px rgba(255,255,255,.5);
+    }
+    @keyframes twinkle{from{transform:scale(.6)} to{transform:scale(1.2)}}
+    
+    .lantern{position:absolute; width:26px; height:34px; background:radial-gradient(circle at 50% 40%, #fff6d0, var(--moon) 60%, #d4a700 90%);
+      border:2px solid #b8860b; border-radius:8px; box-shadow:0 0 18px 6px rgba(255,215,0,.55);
+      animation: drift linear infinite; transform:translateY(100vh) rotate(0deg);
+    }
+    .lantern::after{content:""; position:absolute; bottom:-10px; left:50%; width:2px; height:10px; background:#6b4b1e; transform:translateX(-50%);}
+    @keyframes drift{from{transform: translate(var(--x,0), 110vh) rotate(0deg)} to{transform: translate(calc(var(--x,0) + var(--dx, 0px)), -15vh) rotate(12deg)}}
+
+    /* Hiệu ứng lá rơi */
+    .leaf { position:absolute; width:20px; height:20px; background:linear-gradient(45deg, #ffd700, #ffa500); border-radius:50% 0 50% 0;
+      animation: leafFall linear infinite; pointer-events:none; opacity:0.7;
+    }
+    @keyframes leafFall { from { transform:translateY(-100px) rotate(0deg); } to { transform:translateY(100vh) rotate(360deg); } }
+
+    .card{
+      position:relative;
+      z-index:2;
+      width:min(560px, 92vw);
+      padding:28px 22px;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.7));
+      border-radius:24px;
+      border:1px solid rgba(142,91,45,.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12), 0 0 30px rgba(255,215,0,.25);
+      backdrop-filter: blur(4px);
+    }
+    h1.title{
+      margin:0 0 10px 0;
+      font-family:'Dancing Script', cursive;
+      font-size: clamp(32px, 6vw, 56px);
+      color:var(--lantern);
+      text-shadow:0 2px 0 rgba(0,0,0,.05), 0 0 22px rgba(255,165,0,.35);
+    }
+    .subtitle{
+      margin:6px 0 18px 0;
+      font-size:clamp(14px, 2.8vw, 18px);
+      color:#5c3b1f;
+    }
+    .hero{
+      width:140px;height:140px;margin:6px auto 14px auto;border-radius:18px;
+      background: radial-gradient(circle at 60% 35%, #fff6d8, #ffd257 60%, #e0a800 100%);
+      border:3px solid #b8860b;
+      box-shadow:0 0 26px 8px rgba(255,215,0,.5);
+    }
+    .password-display{
+      font-size:24px; letter-spacing:8px; color:var(--red); min-height:32px; margin:6px 0 10px;
+    }
+    .numpad{
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; max-width:330px; margin:10px auto 6px;
+    }
+    .btn{
+      padding:14px 0; font-size:20px; border-radius:14px; cursor:pointer; border:2px solid #d7a451;
+      background:linear-gradient(180deg, #fff8e8, #ffe3b0);
+      color:#7a4b1f; transition: all 0.3s ease;
+      box-shadow:0 2px 0 #d7a451, 0 8px 18px rgba(230, 126, 34, .15);
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-2px); box-shadow:0 4px 0 #d7a451, 0 12px 24px rgba(230, 126, 34, .25)}
+    .btn:active{transform:translateY(2px) scale(0.98); box-shadow:0 2px 0 #d7a451, 0 4px 8px rgba(230, 126, 34, 0.2);}
+    .btn.clear{grid-column: span 2; background:linear-gradient(180deg, #ffe0d9, #ffcbbf); border-color:#c97b6f; color:#7a1e1e;}
+
+    .note{
+      margin-top:10px; font-size:13px; color:#7c552b; opacity:.9
+    }
+    @media (max-width:420px){ .hero{width:110px; height:110px} }
+
+    /* shake + fade */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+      20%, 40%, 60%, 80% { transform: translateX(8px); }
+    }
+    @keyframes fadeOut { from{opacity:1} to{opacity:0} }
+    .fade-out { animation: fadeOut .8s ease forwards }
+  </style>
+</head>
+<body>
+  <div class="moon-glow"></div>
+  <div class="sky" id="sky"></div>
+
+  <div class="card" id="container">
+    <h1 class="title">Tố Lan Trung Thu Vui Vẻ</h1>
+    <p class="subtitle">Nhập mật khẩu</p>
+    <div class="hero" aria-hidden="true"></div>
+
+    <div class="password-display" id="passwordDisplay"></div>
+
+    <div class="numpad" id="numpad">
+      <div class="btn">1</div>
+      <div class="btn">2</div>
+      <div class="btn">3</div>
+      <div class="btn">4</div>
+      <div class="btn">5</div>
+      <div class="btn">6</div>
+      <div class="btn">7</div>
+      <div class="btn">8</div>
+      <div class="btn">9</div>
+      <div class="btn clear">Xóa</div>
+      <div class="btn">0</div>
+    </div>
+    <div class="note">Gợi ý: 4 số ✨</div>
+  </div>
+
+  <script>
+    // floating stars + lanterns + leaves
+    (function makeSky(){
+      const sky = document.getElementById('sky');
+      const w = window.innerWidth, h = window.innerHeight;
+      
+      // Sao
+      const starCount = Math.min(160, Math.floor((w*h)/9000));
+      for(let i=0;i<starCount;i++){
+        const s = document.createElement('div');
+        s.className='star';
+        s.style.left = (Math.random()*100)+'vw';
+        s.style.top  = (Math.random()*100)+'vh';
+        s.style.setProperty('--r', Math.random().toFixed(2));
+        sky.appendChild(s);
+      }
+      
+      // Đèn lồng
+      const lanterns = 10;
+      for(let i=0;i<lanterns;i++){
+        const l = document.createElement('div');
+        l.className='lantern';
+        const x = Math.random()*100;
+        const drift = (Math.random()*40 - 20).toFixed(1) + 'vw';
+        l.style.left = x+'vw';
+        l.style.setProperty('--x', x+'vw');
+        l.style.setProperty('--dx', drift);
+        l.style.animationDuration = (26+Math.random()*24)+'s';
+        l.style.animationDelay = (Math.random()*12)+'s';
+        sky.appendChild(l);
+      }
+      
+      // Lá rơi
+      const leafCount = 15;
+      for(let i=0;i<leafCount;i++){
+        const leaf = document.createElement('div');
+        leaf.className = 'leaf';
+        leaf.style.left = (Math.random()*100)+'vw';
+        leaf.style.animationDuration = (15+Math.random()*20)+'s';
+        leaf.style.animationDelay = (Math.random()*10)+'s';
+        leaf.style.opacity = (0.3+Math.random()*0.4).toFixed(2);
+        leaf.style.transform = `scale(${0.5+Math.random()*0.7})`;
+        sky.appendChild(leaf);
+      }
+    })();
+
+    const savedPassword = "2110";
+    let currentPassword = "";
+    const container = document.getElementById('container');
+    const display = document.getElementById('passwordDisplay');
+
+    function updateDisplay(){ display.textContent = '•'.repeat(currentPassword.length) }
+    function checkPassword(){
+      if(currentPassword === savedPassword){
+        container.classList.add('fade-out');
+        setTimeout(()=>{ window.location.href = "trang2.html"; }, 800);
+      }else{
+        container.style.animation = 'shake .45s';
+        setTimeout(()=>{ container.style.animation=''; }, 460);
+        currentPassword = "";
+        updateDisplay();
+      }
+    }
+    document.getElementById('numpad').addEventListener('click', (e)=>{
+      const t = e.target;
+      if(!t.classList.contains('btn')) return;
+      const ch = t.textContent.trim();
+      if(ch === 'Xóa'){ currentPassword = currentPassword.slice(0,-1); updateDisplay(); return; }
+      if(currentPassword.length < savedPassword.length){ currentPassword += ch; updateDisplay(); }
+      if(currentPassword.length === savedPassword.length){ checkPassword(); }
+    });
+  </script>
+</body>
+</html>
